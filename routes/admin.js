@@ -5,7 +5,7 @@ const jwt=require("jsonwebtoken");
 const {admin_jwt_key}=require("../config");
 const bcrypt=require("bcrypt");
 const {courseModel,adminModel}=require("../db");
-
+const {adminMiddleware}=require("../middleware/admin");
 adminRouter.post("/signup",async function(req,res){
     const requiredbody=z.object({
         email:z.string().min(7).max(100).email(),
@@ -71,17 +71,69 @@ adminRouter.post("/signin",async function(req,res){
     
 
 });
-adminRouter.post("/addcourses",function(req,res){
+adminRouter.post("/addcourses",adminMiddleware,async function(req,res){
+    const creatorId=req.adminId;
+    const {title,description,price,imageUrl}=req.body;
+    const course=await courseModel.create({
+        title,
+        description,
+        price,
+        imageUrl,
+        creatorId
+    });
+    res.json({
+        message:"Course is created",
+        courseId: course._id
+    })
 
 });
-adminRouter.post("/deletecourses",function(){
-
+adminRouter.post("/deletecourses",adminMiddleware,async function(req,res){
+    const creatorId=req.adminId;
+    const {courseId}=req.body;
+    const result=await courseModel.deleteOne({
+        _id:courseId,
+        creatorId
+    });if(result.deletedCount===0){
+        return res.status(404).json({message:"Course is not found or unauthorized"});
+    }else{
+        res.json({
+            message:"Course is deleted",
+            courseId
+        });
+    }
+    
 });
-adminRouter.put("/updateCourses",function(req,res){
-
+adminRouter.put("/updateCourses",adminMiddleware,async function(req,res){
+    const creatorId=req.adminId;
+    const {title,description,price,imageUrl}=req.body;
+    const {courseId}=req.body;
+    const result=await courseModel.updateOne({
+        _id:courseId,
+        creatorId:creatorId
+    },{
+        title,
+        description,
+        imageUrl,
+        price
+    });
+    if (result.matchedCount === 0) {
+        return res.status(404).json({ message: "Course not found or unauthorized" });
+    }else{
+        res.json({
+            message:"Course updated",
+            courseId
+        });
+    }
+    
 });
-adminRouter.get("/course/bulk",function(req,res){
-
+adminRouter.get("/course/bulk",adminMiddleware,async function(req,res){
+    const creatorId=req.adminId;
+    const courses=await courseModel.find({
+        creatorId
+    })
+    res.json({
+        courses
+    });
 });
 module.exports={
     adminRouter
