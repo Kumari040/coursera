@@ -2,7 +2,7 @@ const {Router}=require("express");
 const adminRouter=Router();
 const {z}=require("zod");
 const jwt=require("jsonwebtoken");
-const admin_jwt_key="iloveindia";
+const {admin_jwt_key}=require("../config");
 const bcrypt=require("bcrypt");
 const {courseModel,adminModel}=require("../db");
 

@@ -2,7 +2,7 @@ const {Router}=require("express");
 const userRouter=Router();
 const {z}=require("zod");
 const jwt=require("jsonwebtoken");
-const user_jwt_key="ilovejapan";
+const {user_jwt_key}=require("../config");
 const bcrypt=require("bcrypt");
 const {userModel,courseModel,purchaseModel}=require("../db");
 userRouter.post("/signup",async function(req,res){
