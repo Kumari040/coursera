@@ -2,7 +2,7 @@ const {Router}=require("express");
 const adminRouter=Router();
 const {z}=require("zod");
 const jwt=require("jsonwebtoken");
-const jwt_secret="iloveindia";
+const admin_jwt_key="iloveindia";
 const bcrypt=require("bcrypt");
 const {courseModel,adminModel}=require("../db");
 
@@ -63,7 +63,7 @@ adminRouter.post("/signin",async function(req,res){
     }else{
         const token=jwt.sign({
             id:admin._id.toString()
-        },jwt_secret);
+        },admin_jwt_key);
         res.json({
             token
         })
