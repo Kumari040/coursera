@@ -5,6 +5,7 @@ const jwt=require("jsonwebtoken");
 const {user_jwt_key}=require("../config");
 const bcrypt=require("bcrypt");
 const {userModel,courseModel,purchaseModel}=require("../db");
+const {userMiddleware}=require("../middleware/user");
 userRouter.post("/signup",async function(req,res){
     const requiredbody=z.object({
         email:z.string().min(9).max(50).email(),
@@ -69,14 +70,31 @@ userRouter.post("/signin",async function(req,res){
     }
     
 });
-userRouter.get("/courses",function(req,res){
+userRouter.get("/courses",userMiddleware,async function(req,res){
+    const result=await courseModel.find({});
+    if(result){
+        res.json({
+            result
+        });
+    }else{
+        res.json({
+            message:"No courses are available !!"
+        });
+    }
 
 });
-userRouter.post("/purchase",function(req,res){
 
-});
-userRouter.post("/myCourses",function(req,res){
-
+userRouter.post("/myCourses",userMiddleware,async function(req,res){
+    const userId=req.userId;
+    const purchases=await purchaseModel.find({
+        userId
+    });
+    const courses=await courseModel.find({
+        _id:{$in:purchases.map(x=>x.courseId)}
+    })
+    res.json({
+        courses
+    });
 });
 module.exports={
     userRouter
