@@ -20,11 +20,11 @@ userRouter.post("/signup",async function(req,res){
         });
         return;
     }
-    const{email,password,firstNAme,lastName}=req.body;
+    const{email,password,firstName,lastName}=req.body;
     const hashedpassword=await bcrypt.hash(password,10);
     await userModel.create({
         email,
-        password,
+        password:hashedpassword,
         firstName,
         lastName
     });

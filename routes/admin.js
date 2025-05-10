@@ -44,7 +44,7 @@ adminRouter.post("/signin",async function(req,res){
     const safeParsedbody=requiredBody.safeParse(req.body);
     if(!safeParsedbody.success){
         res.json({
-            message:"incorrect format of email or passwords",
+            message:"incorrect format of email or password",
             error:safeParsedbody.error
         });
         return;
@@ -89,7 +89,7 @@ adminRouter.post("/addcourses",adminMiddleware,async function(req,res){
 });
 adminRouter.post("/deletecourses",adminMiddleware,async function(req,res){
     const creatorId=req.adminId;
-    const {courseId}=req.body;
+    const courseId=req.body;
     const result=await courseModel.deleteOne({
         _id:courseId,
         creatorId
